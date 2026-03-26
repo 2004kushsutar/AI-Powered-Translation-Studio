@@ -1,7 +1,15 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from app.db import init_db, close_db
 from app.routes.pipeline import router
 
-app = FastAPI(title = "AI Pipeline")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+    await close_db()
+
+app = FastAPI(title="AI Pipeline", lifespan=lifespan)
 
 from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(

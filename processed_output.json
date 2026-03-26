@@ -8,7 +8,7 @@
     },
     "issues": [
         {
-            "id": "d2dd13a1-a009-4410-9ea3-94fb2d81e475",
+            "id": "cd03b494-a5f9-4f04-9c4d-5b8defe90f16",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "are",
@@ -19,7 +19,7 @@
             ]
         },
         {
-            "id": "46a20174-7dbb-46e7-83b1-19ce2c60a04d",
+            "id": "c9226310-29fe-408c-a75d-befaebf6da07",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "Overviewh",
@@ -30,7 +30,7 @@
             ]
         },
         {
-            "id": "64dde765-5a85-4b42-9c4c-ed07757cd805",
+            "id": "dbfa6df6-77b1-48f4-952e-8b2b5358de6e",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "Opearations",
@@ -41,7 +41,7 @@
             ]
         },
         {
-            "id": "1f67fbd1-acd7-4c68-8f06-e7a5058e9b78",
+            "id": "f2c42787-8fa0-4670-922c-6b1cc625db41",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "is",
@@ -52,7 +52,7 @@
             ]
         },
         {
-            "id": "170e34b1-5cb3-4f27-bd9e-63953da8c20d",
+            "id": "34a01829-f88e-48dc-90b3-24ce8c94bd32",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "Introductttion",
@@ -63,7 +63,7 @@
             ]
         },
         {
-            "id": "02471bd2-f277-4409-a248-5cdfb4d9b8fd",
+            "id": "21826e7a-4957-4f42-ae91-e398a8394424",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "comphrehensive",
@@ -74,7 +74,7 @@
             ]
         },
         {
-            "id": "4aa7c0be-228a-4b08-ad15-66cf53b0b47d",
+            "id": "d484590a-5b2d-4765-992f-348dd49aaa7b",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "reparting",
@@ -85,7 +85,7 @@
             ]
         },
         {
-            "id": "99863872-7e98-4420-bb94-25ec1afac3e9",
+            "id": "a4c732a5-da45-4ffd-b7aa-511565e47ea6",
             "issue_type": "spelling",
             "severity": "high",
             "detected_text": "primari",
@@ -96,7 +96,7 @@
             ]
         },
         {
-            "id": "b775b863-e43c-4b65-b16c-cd17a7cd9f35",
+            "id": "a8984afd-7450-4772-9e2e-563e2d9f5c4f",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "and",
@@ -107,7 +107,7 @@
             ]
         },
         {
-            "id": "448a85eb-a0cb-45e2-bca0-c9a0074136e5",
+            "id": "5f2db7e2-5332-4d91-a44a-8b8a2f47c018",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "the",
@@ -118,7 +118,7 @@
             ]
         },
         {
-            "id": "bf7569f9-25d5-4468-beda-3f69ad0f24cd",
+            "id": "178f3b83-2827-4ec6-a8f4-20c26d7b648a",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "and",
@@ -129,7 +129,7 @@
             ]
         },
         {
-            "id": "eac30038-6701-4cbe-b536-7bee8b96222b",
+            "id": "477421e3-a813-44eb-8482-e42522e3ed28",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "or",
@@ -140,7 +140,7 @@
             ]
         },
         {
-            "id": "f70d2739-7ba3-489f-9e59-fdf8e213f766",
+            "id": "82dfb60b-9f78-4d91-8470-98cb5351cedf",
             "issue_type": "formatting",
             "severity": "low",
             "detected_text": "was",
@@ -319,6 +319,9 @@
                     ],
                     "segment_ids": [
                         0
+                    ],
+                    "corrected_chunks": [
+                        "Strategic Overview and Operations"
                     ]
                 },
                 {
@@ -361,6 +364,9 @@
                     ],
                     "segment_ids": [
                         1
+                    ],
+                    "corrected_chunks": [
+                        "Introduction"
                     ]
                 },
                 {
@@ -408,6 +414,11 @@
                         2,
                         3,
                         4
+                    ],
+                    "corrected_chunks": [
+                        "This document serves as a comprehensive template for organizational reporting.",
+                        "The primary objective is to streamline communication across departments while ensuring that all stakeholders have access to high-level data and granular project details.",
+                        "By utilizing a standardized format, we can reduce ambiguity and foster a more collaborative environment."
                     ]
                 },
                 {
@@ -450,6 +461,9 @@
                     ],
                     "segment_ids": [
                         5
+                    ],
+                    "corrected_chunks": [
+                        "Core Objectives for Q1"
                     ]
                 },
                 {
@@ -494,6 +508,10 @@
                     "segment_ids": [
                         6,
                         7
+                    ],
+                    "corrected_chunks": [
+                        "To maintain our current growth trajectory, the following focus areas have been identified as high priority.",
+                        "These objectives align with our long-term vision of market expansion and operational efficiency."
                     ]
                 },
                 {
@@ -537,6 +555,9 @@
                     ],
                     "segment_ids": [
                         8
+                    ],
+                    "corrected_chunks": [
+                        "Market Penetration: Increasing our footprint in the Pacific Northwest region by 15%."
                     ]
                 },
                 {
@@ -580,6 +601,9 @@
                     ],
                     "segment_ids": [
                         9
+                    ],
+                    "corrected_chunks": [
+                        "Infrastructure Upgrade: Migrating legacy server data to the new cloud-based architecture."
                     ]
                 },
                 {
@@ -623,6 +647,9 @@
                     ],
                     "segment_ids": [
                         10
+                    ],
+                    "corrected_chunks": [
+                        "Talent Acquisition: Hiring ten senior-level engineers to support the upcoming product launch."
                     ]
                 },
                 {
@@ -666,6 +693,9 @@
                     ],
                     "segment_ids": [
                         11
+                    ],
+                    "corrected_chunks": [
+                        "Customer Retention: Implementing a new loyalty program to reduce churn by 5%."
                     ]
                 },
                 {
@@ -708,6 +738,9 @@
                     ],
                     "segment_ids": [
                         12
+                    ],
+                    "corrected_chunks": [
+                        "Performance Metrics"
                     ]
                 },
                 {
@@ -752,6 +785,10 @@
                     "segment_ids": [
                         13,
                         14
+                    ],
+                    "corrected_chunks": [
+                        "The following table outlines the key performance indicators (KPIs) recorded over the last three months.",
+                        "These figures represent the baseline for our upcoming fiscal strategy."
                     ]
                 },
                 {
@@ -794,6 +831,9 @@
                     ],
                     "segment_ids": [
                         15
+                    ],
+                    "corrected_chunks": [
+                        "Detailed Project Analysis"
                     ]
                 },
                 {
@@ -836,6 +876,9 @@
                     ],
                     "segment_ids": [
                         16
+                    ],
+                    "corrected_chunks": [
+                        "The Role of Automation in Modern Workflow"
                     ]
                 },
                 {
@@ -880,6 +923,10 @@
                     "segment_ids": [
                         17,
                         18
+                    ],
+                    "corrected_chunks": [
+                        "As we move further into the digital age, the integration of automated systems has become less of a luxury and more of a necessity.",
+                        "Automation allows our creative teams to step away from repetitive manual tasks, such as data entry and basic scheduling, and focus on high-impact strategic initiatives."
                     ]
                 },
                 {
@@ -924,6 +971,10 @@
                     "segment_ids": [
                         19,
                         20
+                    ],
+                    "corrected_chunks": [
+                        "Recent internal audits suggest that teams utilizing automated workflows report a 20% increase in job satisfaction and a significant reduction in human error.",
+                        "We plan to roll out these tools to the Finance and Legal departments by the end of the second quarter."
                     ]
                 },
                 {
@@ -966,6 +1017,9 @@
                     ],
                     "segment_ids": [
                         21
+                    ],
+                    "corrected_chunks": [
+                        "Risk Mitigation and Compliance"
                     ]
                 },
                 {
@@ -1010,6 +1064,10 @@
                     "segment_ids": [
                         22,
                         23
+                    ],
+                    "corrected_chunks": [
+                        "Every project carries inherent risks, ranging from budgetary constraints to shifting market demands.",
+                        "Our approach to risk management involves a proactive \"Identify-Assess-Act\" cycle."
                     ]
                 },
                 {
@@ -1053,6 +1111,9 @@
                     ],
                     "segment_ids": [
                         24
+                    ],
+                    "corrected_chunks": [
+                        "Identification: Weekly meetings to surface potential roadblocks."
                     ]
                 },
                 {
@@ -1096,6 +1157,9 @@
                     ],
                     "segment_ids": [
                         25
+                    ],
+                    "corrected_chunks": [
+                        "Assessment: Using a 5x5 matrix to determine the probability and impact of each risk."
                     ]
                 },
                 {
@@ -1139,6 +1203,9 @@
                     ],
                     "segment_ids": [
                         26
+                    ],
+                    "corrected_chunks": [
+                        "Action: Assigning a dedicated owner to monitor and mitigate the specific issue."
                     ]
                 },
                 {
@@ -1181,6 +1248,9 @@
                     ],
                     "segment_ids": [
                         27
+                    ],
+                    "corrected_chunks": [
+                        "Conclusion"
                     ]
                 },
                 {
@@ -1225,6 +1295,10 @@
                     "segment_ids": [
                         28,
                         29
+                    ],
+                    "corrected_chunks": [
+                        "The data provided in this dummy document illustrates the importance of structured reporting.",
+                        "By maintaining clear headings, organized lists, and transparent data tables, we ensure that the narrative of our progress remains clear to all readers."
                     ]
                 },
                 {
@@ -1266,6 +1340,9 @@
                     ],
                     "segment_ids": [
                         30
+                    ],
+                    "corrected_chunks": [
+                        "Future iterations of this report will include visual aids and deeper financial forecasting to further assist in the decision-making process."
                     ]
                 }
             ],
@@ -1332,6 +1409,9 @@
                                 ],
                                 "segment_ids": [
                                     31
+                                ],
+                                "corrected_chunks": [
+                                    "Department"
                                 ]
                             },
                             {
@@ -1366,6 +1446,9 @@
                                 ],
                                 "segment_ids": [
                                     32
+                                ],
+                                "corrected_chunks": [
+                                    "Metric"
                                 ]
                             },
                             {
@@ -1400,6 +1483,9 @@
                                 ],
                                 "segment_ids": [
                                     33
+                                ],
+                                "corrected_chunks": [
+                                    "Target"
                                 ]
                             },
                             {
@@ -1434,6 +1520,9 @@
                                 ],
                                 "segment_ids": [
                                     34
+                                ],
+                                "corrected_chunks": [
+                                    "Actual"
                                 ]
                             },
                             {
@@ -1468,6 +1557,9 @@
                                 ],
                                 "segment_ids": [
                                     35
+                                ],
+                                "corrected_chunks": [
+                                    "Variance"
                                 ]
                             },
                             {
@@ -1502,6 +1594,9 @@
                                 ],
                                 "segment_ids": [
                                     36
+                                ],
+                                "corrected_chunks": [
+                                    "Sales"
                                 ]
                             },
                             {
@@ -1536,6 +1631,9 @@
                                 ],
                                 "segment_ids": [
                                     37
+                                ],
+                                "corrected_chunks": [
+                                    "Monthly Revenue"
                                 ]
                             },
                             {
@@ -1570,6 +1668,9 @@
                                 ],
                                 "segment_ids": [
                                     38
+                                ],
+                                "corrected_chunks": [
+                                    "$500,000"
                                 ]
                             },
                             {
@@ -1604,6 +1705,9 @@
                                 ],
                                 "segment_ids": [
                                     39
+                                ],
+                                "corrected_chunks": [
+                                    "$525,000"
                                 ]
                             },
                             {
@@ -1638,6 +1742,9 @@
                                 ],
                                 "segment_ids": [
                                     40
+                                ],
+                                "corrected_chunks": [
+                                    "+5%"
                                 ]
                             },
                             {
@@ -1672,6 +1779,9 @@
                                 ],
                                 "segment_ids": [
                                     41
+                                ],
+                                "corrected_chunks": [
+                                    "Marketing"
                                 ]
                             },
                             {
@@ -1706,6 +1816,9 @@
                                 ],
                                 "segment_ids": [
                                     42
+                                ],
+                                "corrected_chunks": [
+                                    "Lead Gen"
                                 ]
                             },
                             {
@@ -1740,6 +1853,9 @@
                                 ],
                                 "segment_ids": [
                                     43
+                                ],
+                                "corrected_chunks": [
+                                    "1,200"
                                 ]
                             },
                             {
@@ -1774,6 +1890,9 @@
                                 ],
                                 "segment_ids": [
                                     44
+                                ],
+                                "corrected_chunks": [
+                                    "1,150"
                                 ]
                             },
                             {
@@ -1808,6 +1927,9 @@
                                 ],
                                 "segment_ids": [
                                     45
+                                ],
+                                "corrected_chunks": [
+                                    "-4%"
                                 ]
                             },
                             {
@@ -1842,6 +1964,9 @@
                                 ],
                                 "segment_ids": [
                                     46
+                                ],
+                                "corrected_chunks": [
+                                    "Support"
                                 ]
                             },
                             {
@@ -1876,6 +2001,9 @@
                                 ],
                                 "segment_ids": [
                                     47
+                                ],
+                                "corrected_chunks": [
+                                    "Response Time"
                                 ]
                             },
                             {
@@ -1910,6 +2038,9 @@
                                 ],
                                 "segment_ids": [
                                     48
+                                ],
+                                "corrected_chunks": [
+                                    "< 2 hours"
                                 ]
                             },
                             {
@@ -1944,6 +2075,9 @@
                                 ],
                                 "segment_ids": [
                                     49
+                                ],
+                                "corrected_chunks": [
+                                    "1.8 hours"
                                 ]
                             },
                             {
@@ -1978,6 +2112,9 @@
                                 ],
                                 "segment_ids": [
                                     50
+                                ],
+                                "corrected_chunks": [
+                                    "+10%"
                                 ]
                             },
                             {
@@ -2012,6 +2149,9 @@
                                 ],
                                 "segment_ids": [
                                     51
+                                ],
+                                "corrected_chunks": [
+                                    "Product"
                                 ]
                             },
                             {
@@ -2046,6 +2186,9 @@
                                 ],
                                 "segment_ids": [
                                     52
+                                ],
+                                "corrected_chunks": [
+                                    "Feature Ship Rate"
                                 ]
                             },
                             {
@@ -2080,6 +2223,9 @@
                                 ],
                                 "segment_ids": [
                                     53
+                                ],
+                                "corrected_chunks": [
+                                    "4 units"
                                 ]
                             },
                             {
@@ -2114,6 +2260,9 @@
                                 ],
                                 "segment_ids": [
                                     54
+                                ],
+                                "corrected_chunks": [
+                                    "3 units"
                                 ]
                             },
                             {
@@ -2148,6 +2297,9 @@
                                 ],
                                 "segment_ids": [
                                     55
+                                ],
+                                "corrected_chunks": [
+                                    "-25%"
                                 ]
                             }
                         ],
@@ -2187,6 +2339,9 @@
                                     ],
                                     "segment_ids": [
                                         56
+                                    ],
+                                    "corrected_chunks": [
+                                        "Department"
                                     ]
                                 },
                                 {
@@ -2221,6 +2376,9 @@
                                     ],
                                     "segment_ids": [
                                         57
+                                    ],
+                                    "corrected_chunks": [
+                                        "Metric"
                                     ]
                                 },
                                 {
@@ -2255,6 +2413,9 @@
                                     ],
                                     "segment_ids": [
                                         58
+                                    ],
+                                    "corrected_chunks": [
+                                        "Target"
                                     ]
                                 },
                                 {
@@ -2289,6 +2450,9 @@
                                     ],
                                     "segment_ids": [
                                         59
+                                    ],
+                                    "corrected_chunks": [
+                                        "Actual"
                                     ]
                                 },
                                 {
@@ -2323,6 +2487,9 @@
                                     ],
                                     "segment_ids": [
                                         60
+                                    ],
+                                    "corrected_chunks": [
+                                        "Variance"
                                     ]
                                 }
                             ],
@@ -2359,6 +2526,9 @@
                                     ],
                                     "segment_ids": [
                                         61
+                                    ],
+                                    "corrected_chunks": [
+                                        "Sales"
                                     ]
                                 },
                                 {
@@ -2393,6 +2563,9 @@
                                     ],
                                     "segment_ids": [
                                         62
+                                    ],
+                                    "corrected_chunks": [
+                                        "Monthly Revenue"
                                     ]
                                 },
                                 {
@@ -2427,6 +2600,9 @@
                                     ],
                                     "segment_ids": [
                                         63
+                                    ],
+                                    "corrected_chunks": [
+                                        "$500,000"
                                     ]
                                 },
                                 {
@@ -2461,6 +2637,9 @@
                                     ],
                                     "segment_ids": [
                                         64
+                                    ],
+                                    "corrected_chunks": [
+                                        "$525,000"
                                     ]
                                 },
                                 {
@@ -2495,6 +2674,9 @@
                                     ],
                                     "segment_ids": [
                                         65
+                                    ],
+                                    "corrected_chunks": [
+                                        "+5%"
                                     ]
                                 }
                             ],
@@ -2531,6 +2713,9 @@
                                     ],
                                     "segment_ids": [
                                         66
+                                    ],
+                                    "corrected_chunks": [
+                                        "Marketing"
                                     ]
                                 },
                                 {
@@ -2565,6 +2750,9 @@
                                     ],
                                     "segment_ids": [
                                         67
+                                    ],
+                                    "corrected_chunks": [
+                                        "Lead Gen"
                                     ]
                                 },
                                 {
@@ -2599,6 +2787,9 @@
                                     ],
                                     "segment_ids": [
                                         68
+                                    ],
+                                    "corrected_chunks": [
+                                        "1,200"
                                     ]
                                 },
                                 {
@@ -2633,6 +2824,9 @@
                                     ],
                                     "segment_ids": [
                                         69
+                                    ],
+                                    "corrected_chunks": [
+                                        "1,150"
                                     ]
                                 },
                                 {
@@ -2667,6 +2861,9 @@
                                     ],
                                     "segment_ids": [
                                         70
+                                    ],
+                                    "corrected_chunks": [
+                                        "-4%"
                                     ]
                                 }
                             ],
@@ -2703,6 +2900,9 @@
                                     ],
                                     "segment_ids": [
                                         71
+                                    ],
+                                    "corrected_chunks": [
+                                        "Support"
                                     ]
                                 },
                                 {
@@ -2737,6 +2937,9 @@
                                     ],
                                     "segment_ids": [
                                         72
+                                    ],
+                                    "corrected_chunks": [
+                                        "Response Time"
                                     ]
                                 },
                                 {
@@ -2771,6 +2974,9 @@
                                     ],
                                     "segment_ids": [
                                         73
+                                    ],
+                                    "corrected_chunks": [
+                                        "< 2 hours"
                                     ]
                                 },
                                 {
@@ -2805,6 +3011,9 @@
                                     ],
                                     "segment_ids": [
                                         74
+                                    ],
+                                    "corrected_chunks": [
+                                        "1.8 hours"
                                     ]
                                 },
                                 {
@@ -2839,6 +3048,9 @@
                                     ],
                                     "segment_ids": [
                                         75
+                                    ],
+                                    "corrected_chunks": [
+                                        "+10%"
                                     ]
                                 }
                             ],
@@ -2875,6 +3087,9 @@
                                     ],
                                     "segment_ids": [
                                         76
+                                    ],
+                                    "corrected_chunks": [
+                                        "Product"
                                     ]
                                 },
                                 {
@@ -2909,6 +3124,9 @@
                                     ],
                                     "segment_ids": [
                                         77
+                                    ],
+                                    "corrected_chunks": [
+                                        "Feature Ship Rate"
                                     ]
                                 },
                                 {
@@ -2943,6 +3161,9 @@
                                     ],
                                     "segment_ids": [
                                         78
+                                    ],
+                                    "corrected_chunks": [
+                                        "4 units"
                                     ]
                                 },
                                 {
@@ -2977,6 +3198,9 @@
                                     ],
                                     "segment_ids": [
                                         79
+                                    ],
+                                    "corrected_chunks": [
+                                        "3 units"
                                     ]
                                 },
                                 {
@@ -3011,6 +3235,9 @@
                                     ],
                                     "segment_ids": [
                                         80
+                                    ],
+                                    "corrected_chunks": [
+                                        "-25%"
                                     ]
                                 }
                             ]

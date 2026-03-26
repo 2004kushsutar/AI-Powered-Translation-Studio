@@ -47,6 +47,10 @@ def check_grammar(text, label=None, seg_id=None):
         error_length = getattr(match, 'errorLength', getattr(match, 'error_length', 0))
         detected = text[offset:offset+error_length]
         
+        # Skip purely whitespace formatting issues (common in PDF extraction kerning)
+        if not detected.strip():
+            continue
+        
         issues.append({
             "id": str(uuid.uuid4()),
             "issue_type": issue_type,

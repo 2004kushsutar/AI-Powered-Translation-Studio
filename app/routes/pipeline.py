@@ -6,6 +6,7 @@ from app.services.parser import parse_document
 from app.services.consistency import check_consistency
 from app.services.grammar import check_grammar
 from app.utils.helpers import extract_sentences
+from app.db import get_db
 
 router = APIRouter()
 
@@ -46,28 +47,42 @@ async def process_file(file: UploadFile = File(...)):
         "parsed": parsed
     }
     
-    # Store the result so the GET endpoint can serve it to the React UI later
-    import json
-    with open("processed_output.json", "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
-        
+    # Store the result in MongoDB
+    db = get_db()
+    if db is not None:
+        import json
+        result_to_insert = result.copy()
+        result_to_insert["parsed"] = json.dumps(result["parsed"], ensure_ascii=False)
+        try:
+            await db.documents.insert_one(result_to_insert)
+        except Exception as e:
+            print(f"MongoDB Insert Error: {e}")
+            result["db_error"] = str(e)
+            
+        # Ensure we don't accidentally leak ObjectId to our returning payload
+        result_to_insert.pop("_id", None)
+        result.pop("_id", None)
+            
     return result
 
 @router.get("/sourcevalidation")
 async def get_source_validation():
-    import json
-    try:
-        with open("processed_output.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-            
-        return {
-            "status": data.get("status", "success"),
-            "stats": data.get("stats", {}),
-            "issues": data.get("issues", []),
-            "parsed": data.get("parsed", {})
-        }
-    except FileNotFoundError:
-        return {"error": "No processed data found. Please upload a file first via POST /process."}
+    db = get_db()
+    if db is not None:
+        doc = await db.documents.find_one({}, sort=[('_id', -1)])
+        if doc:
+            import json
+            parsed_data = doc.get("parsed", {})
+            if isinstance(parsed_data, str):
+                parsed_data = json.loads(parsed_data)
+                
+            return {
+                "status": doc.get("status", "success"),
+                "stats": doc.get("stats", {}),
+                "issues": doc.get("issues", []),
+                "parsed": parsed_data
+            }
+    return {"error": "No data found. Please upload a file first via POST /process."}
 
 from pydantic import BaseModel
 from typing import List, Optional
@@ -112,11 +127,20 @@ def apply_corrections(data, issues_map):
 
 @router.post("/save")
 async def save_document(request: SaveRequest):
-    import json
+    db = get_db()
+    if db is None:
+        return {"status": "error", "message": "Database not connected."}
+        
     try:
-        with open("processed_output.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
+        doc = await db.documents.find_one({}, sort=[('_id', -1)])
+        if not doc:
+            return {"status": "error", "message": "No document found in database."}
             
+        import json
+        parsed_data = doc.get("parsed", {})
+        if isinstance(parsed_data, str):
+            parsed_data = json.loads(parsed_data)
+        
         issues_map = {}
         for issue in request.issues:
             if issue.status == "resolved":
@@ -125,11 +149,10 @@ async def save_document(request: SaveRequest):
                         issues_map[seg_id] = []
                     issues_map[seg_id].append(issue)
                     
-        apply_corrections(data.get("parsed", {}), issues_map)
+        apply_corrections(parsed_data, issues_map)
         
-        with open("processed_output.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        await db.documents.update_one({'_id': doc['_id']}, {'$set': {'parsed': json.dumps(parsed_data, ensure_ascii=False)}})
             
-        return {"status": "success", "message": "Changes written permanently to processed_output.json under corrected_chunks."}
+        return {"status": "success", "message": "Changes written permanently to MongoDB."}
     except Exception as e:
         return {"status": "error", "message": str(e)}

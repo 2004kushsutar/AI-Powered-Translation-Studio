@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FileText, Save, Download, Undo, Redo, AlertCircle, CheckCircle2, AlertTriangle, Info, Edit2, X } from 'lucide-react';
 import './DashboardStudio.css';
 
-export default function DashboardStudio({ data, fileName }) {
+export default function DashboardStudio({ data, fileName, onSwitchMode }) {
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   
   // Track issues with an added 'status' flag ('active' | 'resolved')
@@ -273,6 +273,21 @@ export default function DashboardStudio({ data, fileName }) {
 
   return (
     <div className="dashboard-container animate-fade-in">
+      {/* Global App header simulating routing tabs */}
+      <div className="global-app-bar" style={{ background: '#5b21b6', color: 'white', padding: '0.5rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', fontSize: '1.1rem' }}>
+          <FileText size={22} color="white"/> AI-Powered Translation Studio
+        </div>
+        <div style={{ display: 'flex', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', overflow: 'hidden' }}>
+          <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '500', background: 'white', color: '#5b21b6', border: 'none', cursor: 'pointer' }}>
+            <FileText size={16}/> Quality Validation
+          </button>
+          <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '500', background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer', transition: '0.2s' }} onClick={() => typeof onSwitchMode === 'function' && onSwitchMode('translation')}>
+            <FileText size={16}/> Translation Mode
+          </button>
+        </div>
+      </div>
+
       {/* Header Panel */}
       <header className="dashboard-header">
         <div className="header-left">
