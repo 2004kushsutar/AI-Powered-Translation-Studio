@@ -54,19 +54,45 @@ def get_style_for_block(block, fitz_doc, pages_cache):
         if fitz_page_index < 0 or fitz_page_index >= len(fitz_doc):
             return default_style
             
+        fitz_page = fitz_doc[fitz_page_index]
+        page_width = fitz_page.rect.width
+        bbox = prov[0].get("bbox", {})
+        
+        text_align = "left"
+        if bbox and "l" in bbox and "r" in bbox:
+            l = bbox["l"]
+            r = bbox["r"]
+            block_width = r - l
+            if block_width > 0:
+                if block_width > (page_width * 0.7):
+                    text_align = "left"
+                else:
+                    center_x = (l + r) / 2
+                    page_center = page_width / 2
+                    if abs(center_x - page_center) < (page_width * 0.05):
+                        text_align = "center"
+                    elif abs(page_width - r) < (page_width * 0.1) and l > (page_width * 0.2):
+                        text_align = "right"
+            
         if fitz_page_index not in pages_cache:
-            pages_cache[fitz_page_index] = extract_styles_from_page(fitz_doc[fitz_page_index])
+            pages_cache[fitz_page_index] = extract_styles_from_page(fitz_page)
             
         page_styles = pages_cache[fitz_page_index]
         block_text = block.get("text", "").lower()
         if not block_text:
-            return default_style
+            return {**default_style, "textAlign": text_align}
             
         for s in page_styles:
             if s["text"] and len(s["text"]) > 2:
                 if s["text"].lower() in block_text or block_text in s["text"].lower():
-                    return {"fontFamily": s["font"], "fontSize": round(s["size"]), "color": s["color"]}
+                    return {
+                        "fontFamily": s["font"], 
+                        "fontSize": round(s["size"]), 
+                        "color": s["color"], 
+                        "textAlign": text_align
+                    }
                     
+        return {**default_style, "textAlign": text_align}
     except Exception as e:
         print("Style match error", e)
         pass

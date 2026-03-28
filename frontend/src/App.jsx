@@ -12,34 +12,35 @@ function App() {
   return (
     <div className="app-container">
       {appState === 'upload' && (
-        <UploadScreen 
+        <UploadScreen
           onUpload={(name) => {
             setFileName(name);
             setAppState('loading');
-          }} 
+          }}
           setValidationData={setValidationData}
         />
       )}
 
       {appState === 'loading' && (
-        <LoadingScreen 
+        <LoadingScreen
           fileName={fileName}
           onStart={() => setAppState('dashboard')}
         />
       )}
 
       {appState === 'dashboard' && (
-        <DashboardStudio 
-          data={validationData} 
-          fileName={fileName} 
-          onSwitchMode={(mode) => setAppState(mode)} 
+        <DashboardStudio
+          data={validationData}
+          fileName={fileName}
+          onSwitchMode={(mode) => setAppState(mode)}
         />
       )}
 
       {appState === 'translation' && (
-        <TranslationStudio 
-          fileName={fileName} 
-          onSwitchMode={(mode) => setAppState(mode)} 
+        <TranslationStudio
+          data={validationData}
+          fileName={fileName}
+          onSwitchMode={(mode) => setAppState(mode)}
         />
       )}
     </div>
