@@ -40,11 +40,25 @@ async def process_file(file: UploadFile = File(...)):
         "resolved": 0
     }
     
+    detected_lang = "en"
+    if parsed.get("data"):
+        try:
+            import langdetect
+            sample_text = " ".join([item["text"] for item in extract_sentences(parsed["data"])[:10] if item.get("text")])
+            if sample_text.strip():
+                detected_lang = langdetect.detect(sample_text)
+        except Exception:
+            pass
+            
+    LANG_MAP = {"en": "English", "es": "Spanish", "fr": "French", "de": "German", "hi": "Hindi", "it": "Italian", "pt": "Portuguese", "ru": "Russian"}
+    source_language = LANG_MAP.get(detected_lang[:2].lower(), "English")
+    
     result = {
         "status": "success",
         "stats": stats,
         "issues": issues,
-        "parsed": parsed
+        "parsed": parsed,
+        "source_language": source_language
     }
     
     # Store the result in MongoDB

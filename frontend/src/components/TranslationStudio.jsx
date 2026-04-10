@@ -9,6 +9,8 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [liveData, setLiveData] = useState(data);
+  const [sourceLang, setSourceLang] = useState('English');
+  const [targetLang, setTargetLang] = useState('Hindi');
 
   const [segments, setSegments] = useState([]);
 
@@ -95,6 +97,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
           }
           setSegments(extracted);
           setLiveData(freshData);
+          setSourceLang(freshData?.source_language || 'English');
           if (extracted.length > 0) setSelectedSegmentId(extracted[0].id);
         } else {
           throw new Error("Failed to fetch");
@@ -161,9 +164,9 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
     if (queries.length > 0) {
       try {
-        const payload = { texts: queries };
+        const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang };
 
-        const response = await fetch("https://answer-me-api.onrender.com/api/v1/match", {
+        const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -207,10 +210,11 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     if (!seg) return;
     setIsRegenerating(true);
     try {
-      const response = await fetch("https://answer-me-api.onrender.com/api/v1/match", {
+      const payload = { texts: [seg.source], source_lang: sourceLang, target_lang: targetLang };
+      const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texts: [seg.source] })
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
         const data = await response.json();
@@ -396,9 +400,27 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
           <span className="doc-badge">{fileName || 'document_validated.pdf'}</span>
 
           <div className="lang-selector">
-            <select className="lang-dropdown"><option>English</option></select>
+            <select className="lang-dropdown" value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="Hindi">Hindi</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Russian">Russian</option>
+            </select>
             <ArrowRightLeft size={16} className="text-gray-400" />
-            <select className="lang-dropdown"><option>Hindi</option><option>Spanish</option><option>French</option></select>
+            <select className="lang-dropdown" value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="Hindi">Hindi</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Russian">Russian</option>
+            </select>
           </div>
 
           <button
@@ -538,7 +560,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
               <div className="details-content animate-fade-in">
                 <div className="field-group">
                   <div className="field-label flex-between">
-                    Source Text (English)
+                    Source Text ({sourceLang})
                   </div>
                   <div className="field-box box-neutral">{selectedSegment.source}</div>
                 </div>
