@@ -6,7 +6,6 @@ export default function LoadingScreen({ fileName, onStart }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Animate progress to 100% over 1 second to simulate UI rendering
     const timer = setTimeout(() => {
       setProgress(100);
     }, 100);
@@ -19,10 +18,10 @@ export default function LoadingScreen({ fileName, onStart }) {
         <div className="success-icon-wrapper animate-slide-up">
           <CheckCircle2 size={32} />
         </div>
-        
+
         <h2 className="loading-title">File Uploaded Successfully</h2>
         <p className="loading-subtitle">{fileName || 'Document.pdf'}</p>
-        
+
         <div className="progress-wrapper">
           <div className="progress-labels">
             <span>Upload Progress</span>
@@ -32,7 +31,7 @@ export default function LoadingScreen({ fileName, onStart }) {
             <div className="progress-fill" style={{ width: `${progress}%` }}></div>
           </div>
         </div>
-        
+
         {progress === 100 && (
           <div className="info-box animate-slide-up">
             <Info className="info-icon" size={20} />
@@ -42,13 +41,13 @@ export default function LoadingScreen({ fileName, onStart }) {
             </div>
           </div>
         )}
-        
+
         <div className="loading-actions">
           <button className="btn-secondary" onClick={() => window.location.reload()}>
             Upload Different File
           </button>
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             onClick={onStart}
             disabled={progress < 100}
           >

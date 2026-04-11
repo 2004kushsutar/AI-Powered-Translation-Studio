@@ -12,7 +12,6 @@ export default function UploadScreen({ onUpload, setValidationData }) {
     formData.append('file', file);
 
     try {
-      // Mock network delay for UX if processing is too fast
       const [response] = await Promise.all([
         fetch('http://127.0.0.1:8000/process', {
           method: 'POST',

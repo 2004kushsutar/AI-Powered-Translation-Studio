@@ -4,13 +4,12 @@ import './DashboardStudio.css';
 
 export default function DashboardStudio({ data, fileName, onSwitchMode }) {
   const [selectedIssueId, setSelectedIssueId] = useState(null);
-  
-  // Track issues with an added 'status' flag ('active' | 'resolved')
+
+
   const [issuesData, setIssuesData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [customEditText, setCustomEditText] = useState("");
 
-  // History state for Undo/Redo
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -33,13 +32,13 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
     resolved: issuesData.filter(i => i.status === 'resolved').length
   };
 
-  const parsed = data?.parsed?.data; // from docling parser
+  const parsed = data?.parsed?.data;
 
   const pushStateToHistory = (newIssuesData) => {
     setHistory(prev => {
-       const newHistory = prev.slice(0, historyIndex + 1);
-       newHistory.push(newIssuesData);
-       return newHistory;
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newIssuesData);
+      return newHistory;
     });
     setHistoryIndex(prev => prev + 1);
   };
@@ -51,10 +50,10 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
       }
       return issue;
     });
-    
+
     setIssuesData(newIssuesData);
     pushStateToHistory(newIssuesData);
-    
+
     setSelectedIssueId(null);
     setIsEditing(false);
   };
@@ -76,14 +75,14 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
   };
 
   const handleAccept = (issue) => {
-    const fixText = (issue.ai_suggested_fix === "(Remove word)") 
-      ? "" 
+    const fixText = (issue.ai_suggested_fix === "(Remove word)")
+      ? ""
       : issue.ai_suggested_fix;
     resolveIssue(issue.id, fixText);
   };
 
   const handleReject = (issue) => {
-    resolveIssue(issue.id, issue.detected_text); // replace with original text
+    resolveIssue(issue.id, issue.detected_text);
   };
 
   const handleEdit = (issue) => {
@@ -109,8 +108,8 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
         alert('Failed to save document: ' + result.message);
       }
     } catch (error) {
-       console.error(error);
-       alert("Network error connecting to the backend to save the file.");
+      console.error(error);
+      alert("Network error connecting to the backend to save the file.");
     }
   };
 
@@ -128,18 +127,18 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
     return current;
   };
 
-  // Helper to render text chunks seamlessly mapped to appropriate semantic layout blocks
+
   const renderDocument = (node, index = 0, rootNode = parsed) => {
     if (!node) return null;
 
-    // Resolve JSON pointers maintaining chronological document reading order
+
     if (node.$ref) {
       const resolved = resolveRef(node.$ref, rootNode);
       if (!resolved) return null;
       return renderDocument(resolved, index, rootNode);
     }
 
-    // Document Root
+
     if (node === rootNode && node.body && Array.isArray(node.body.children)) {
       return (
         <div key="root-body" className="doc-body">
@@ -147,19 +146,19 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
         </div>
       );
     }
-    
-    // Explicit 2D Table Rendering Map
+
+
     if (node.label === 'table' || node.type === 'table') {
       const cells = node.data?.table_cells || [];
       if (cells.length === 0) return null;
 
       const maxRowIdx = Math.max(...cells.map(c => c.end_row_offset_idx || 0));
-      
+
       const rows = [];
       for (let r = 0; r <= maxRowIdx; r++) {
-         const rowCells = cells.filter(c => c.start_row_offset_idx === r);
-         rowCells.sort((a, b) => (a.start_col_offset_idx || 0) - (b.start_col_offset_idx || 0));
-         rows.push(rowCells);
+        const rowCells = cells.filter(c => c.start_row_offset_idx === r);
+        rowCells.sort((a, b) => (a.start_col_offset_idx || 0) - (b.start_col_offset_idx || 0));
+        rows.push(rowCells);
       }
 
       return (
@@ -168,9 +167,9 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
             {rows.map((rowCells, rIdx) => (
               <tr key={rIdx}>
                 {rowCells.map((cell, cIdx) => (
-                  <td 
-                    key={cIdx} 
-                    colSpan={cell.col_span || 1} 
+                  <td
+                    key={cIdx}
+                    colSpan={cell.col_span || 1}
                     rowSpan={cell.row_span || 1}
                     className={cell.column_header ? "doc-table-header" : "doc-table-cell"}
                   >
@@ -183,30 +182,30 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
         </table>
       );
     }
-    
-    // Standard Content Extraction
+
+
     if (typeof node === 'object' && node.original_chunks) {
       const label = node.label || 'text';
       const nodeStyle = node.style || {};
-      
+
       const reactStyle = {
-         fontFamily: nodeStyle.fontFamily !== 'inherit' ? nodeStyle.fontFamily : undefined,
-         fontSize: nodeStyle.fontSize ? `${nodeStyle.fontSize}px` : undefined,
-         color: nodeStyle.color || undefined
+        fontFamily: nodeStyle.fontFamily !== 'inherit' ? nodeStyle.fontFamily : undefined,
+        fontSize: nodeStyle.fontSize ? `${nodeStyle.fontSize}px` : undefined,
+        color: nodeStyle.color || undefined
       };
-      
+
       const contentChunks = node.original_chunks.map((chunk, i) => {
         const seg_id = node.segment_ids ? node.segment_ids[i] : null;
-        
-        // Find all issues for this segment
+
+
         const segmentIssues = issuesData.filter(issue => issue.affected_segments?.includes(seg_id));
-        
-        // Apply resolved text replacements
+
+
         let displayText = chunk;
         segmentIssues.forEach(issue => {
           if (issue.status === 'resolved' && issue.resolvedTo !== undefined && issue.detected_text) {
             if (issue.resolvedTo === "") {
-              // If removing a word completely, cleanly swallow the trailing whitespace
+
               const removePattern = new RegExp(`\\s*\\b${issue.detected_text}\\b\\s*`);
               displayText = displayText.replace(removePattern, ' ');
             } else {
@@ -216,11 +215,11 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
         });
 
         const activeIssue = segmentIssues.find(i => i.status === 'active');
-        
+
         if (activeIssue) {
           return (
-            <span 
-              key={i} 
+            <span
+              key={i}
               className={`highlight highlight-${activeIssue.severity} ${selectedIssueId === activeIssue.id ? 'active' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -235,7 +234,7 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
         return <span key={i}>{displayText} </span>;
       });
 
-      // Render the correct structural tag for document authenticity formatting
+
       if (label === 'title') {
         return <h1 key={index} className="doc-title" style={reactStyle}>{contentChunks}</h1>;
       }
@@ -248,12 +247,12 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
       if (label === 'table_cell') {
         return <div key={index} style={reactStyle}>{contentChunks}</div>;
       }
-      
-      // Default paragraphs
+
+
       return <p key={index} className="doc-paragraph" style={reactStyle}>{contentChunks}</p>;
     }
-    
-    // Nested children structure like Lists
+
+
     if (node.children && Array.isArray(node.children) && node.children.length > 0) {
       return (
         <div key={index} className="node-group">
@@ -276,14 +275,14 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
       {/* Global App header simulating routing tabs */}
       <div className="global-app-bar" style={{ background: '#5b21b6', color: 'white', padding: '0.5rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', fontSize: '1.1rem' }}>
-          <FileText size={22} color="white"/> AI-Powered Translation Studio
+          <FileText size={22} color="white" /> AI-Powered Translation Studio
         </div>
         <div style={{ display: 'flex', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', overflow: 'hidden' }}>
           <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '500', background: 'white', color: '#5b21b6', border: 'none', cursor: 'pointer' }}>
-            <FileText size={16}/> Quality Validation
+            <FileText size={16} /> Quality Validation
           </button>
           <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '500', background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer', transition: '0.2s' }} onClick={() => typeof onSwitchMode === 'function' && onSwitchMode('translation')}>
-            <FileText size={16}/> Translation Mode
+            <FileText size={16} /> Translation Mode
           </button>
         </div>
       </div>
@@ -294,16 +293,16 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
           <div className="doc-name"><FileText size={20} className="text-primary-blue" /> {fileName || 'Document.pdf'}</div>
         </div>
         <div className="header-actions">
-          <button 
-            className="header-btn" 
+          <button
+            className="header-btn"
             onClick={handleUndo}
             disabled={historyIndex <= 0}
             style={{ opacity: historyIndex <= 0 ? 0.3 : 1, cursor: historyIndex <= 0 ? 'not-allowed' : 'pointer' }}
           >
             <Undo size={18} /> Undo
           </button>
-          <button 
-            className="header-btn" 
+          <button
+            className="header-btn"
             onClick={handleRedo}
             disabled={history.length === 0 || historyIndex >= history.length - 1}
             style={{ opacity: history.length === 0 || historyIndex >= history.length - 1 ? 0.3 : 1, cursor: history.length === 0 || historyIndex >= history.length - 1 ? 'not-allowed' : 'pointer' }}
@@ -339,11 +338,11 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
               </div>
             </div>
           </div>
-          
+
           <div className="issues-list">
             {activeIssues.map(issue => (
-              <div 
-                key={issue.id} 
+              <div
+                key={issue.id}
                 className={`issue-card-preview ${selectedIssueId === issue.id ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedIssueId(issue.id);
@@ -376,48 +375,48 @@ export default function DashboardStudio({ data, fileName, onSwitchMode }) {
             <h3>Issue Details</h3>
             <button className="header-btn" onClick={() => setSelectedIssueId(null)}><X size={20} /></button>
           </div>
-          
+
           {selectedIssue ? (
             <div className="details-content animate-fade-in">
               <div className="badges-row">
                 <span className={`issue-badge badge-${selectedIssue.issue_type}`}>{selectedIssue.issue_type.toUpperCase()}</span>
                 <span className={`issue-badge badge-spelling`}>{selectedIssue.severity.toUpperCase()} SEVERITY</span>
               </div>
-              
+
               <div className="field-group">
                 <div className="field-label">Detected Text</div>
                 <div className="field-box box-error">"{selectedIssue.detected_text}"</div>
               </div>
-              
+
               <div className="field-group">
                 <div className="field-label">✨ AI Suggested Fix</div>
                 <div className="field-box box-success">"{selectedIssue.ai_suggested_fix}"</div>
               </div>
-              
+
               <div className="field-group">
                 <div className="field-label">Context</div>
                 <div className="field-box box-neutral">{selectedIssue.context}</div>
               </div>
-              
+
               <div className="actions-panel">
                 {isEditing ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                     <input 
-                       type="text" 
-                       value={customEditText}
-                       onChange={(e) => setCustomEditText(e.target.value)}
-                       style={{ 
-                         padding: '0.75rem', 
-                         borderRadius: '0.5rem', 
-                         border: '1px solid var(--primary-blue)', 
-                         width: '100%',
-                         fontFamily: 'Inter',
-                         outline: 'none'
-                       }}
-                       autoFocus
-                     />
-                     <button className="btn-accept" onClick={() => handleEdit(selectedIssue)}>Save Custom Edit</button>
-                     <button className="btn-outline" onClick={() => setIsEditing(false)}>Cancel</button>
+                    <input
+                      type="text"
+                      value={customEditText}
+                      onChange={(e) => setCustomEditText(e.target.value)}
+                      style={{
+                        padding: '0.75rem',
+                        borderRadius: '0.5rem',
+                        border: '1px solid var(--primary-blue)',
+                        width: '100%',
+                        fontFamily: 'Inter',
+                        outline: 'none'
+                      }}
+                      autoFocus
+                    />
+                    <button className="btn-accept" onClick={() => handleEdit(selectedIssue)}>Save Custom Edit</button>
+                    <button className="btn-outline" onClick={() => setIsEditing(false)}>Cancel</button>
                   </div>
                 ) : (
                   <>

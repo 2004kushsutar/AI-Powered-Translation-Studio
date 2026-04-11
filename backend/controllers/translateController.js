@@ -3,18 +3,15 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import crypto from "crypto"; // Native Node.js module for UUIDs
-// 1. Schema for Gemini Structured Output
+import crypto from "crypto";
 
 const translationSchema = z.array(z.string()).describe(
   "Array of translated strings matching input order"
 );
 
-// 2. Initialize Clients (Use Environment Variables!)
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDHnMR3C-yH_f0mqn3DaFR0lnb9Teg3T1g" });
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 const pc = new Pinecone({
-  apiKey:
-    "pcsk_A9aQi_LWxcEAaC4NiLVvgMAB6YXya4StFvhZKz5tFaTKMmHjMqqT16mhuwmyycoes8C5Z",
+  apiKey: process.env.PINECONE_API_KEY,
 });
 
 const index = pc.index(
@@ -29,7 +26,7 @@ const initModel = async () => {
 };
 
 async function createEmbedding(text) {
-  await initModel(); // Ensure model is loaded
+  await initModel();
   const embedding = await extractor(text, { pooling: "mean", normalize: true });
   return Array.from(embedding.data);
 }
@@ -38,7 +35,7 @@ export const categorizeStrings = async (req, res) => {
   try {
     const { texts, sourceLang = "en", lang = "hi", glossary = [] } = req.body;
 
-    // Auto-map UI human strings back to short codes for Pinecone Namespace logic
+
     const langMap = { english: "en", hindi: "hi", spanish: "es", french: "fr", german: "de", italian: "it", portuguese: "pt", russian: "ru" };
     const nsSource = langMap[sourceLang.toLowerCase()] || sourceLang;
     const nsTarget = langMap[lang.toLowerCase()] || lang;
@@ -46,7 +43,7 @@ export const categorizeStrings = async (req, res) => {
     const results = { exact: [], fuzzy: [], new: [] };
     const needsTranslation = [];
 
-    // 1. Parallel Search (Same as before)
+
     await Promise.all(
       texts.map(async (text) => {
         const queryVector = await createEmbedding(text);
@@ -68,7 +65,7 @@ export const categorizeStrings = async (req, res) => {
         } else {
           needsTranslation.push({
             text,
-            vector: queryVector, // Store vector here to reuse it for upserting later
+            vector: queryVector,
             score,
             type: score >= 0.75 ? "fuzzy" : "new",
             matchText: bestMatch?.metadata?.text || null,
@@ -78,7 +75,7 @@ export const categorizeStrings = async (req, res) => {
       }),
     );
 
-    // 2. Batch Call to Gemini
+
     if (needsTranslation.length > 0) {
       const textsToTranslate = needsTranslation.map((item) => item.text);
 
@@ -103,13 +100,12 @@ export const categorizeStrings = async (req, res) => {
         JSON.parse(aiResponse.text),
       );
 
-      // 3. Prepare records for Pinecone Upsert
+
       const upsertRecords = [];
 
       needsTranslation.forEach((item, index) => {
         const suggestion = translations[index] || "Translation missing";
 
-        // Add to response results
         if (item.type === "fuzzy") {
           results.fuzzy.push({
             text: item.text,
@@ -126,10 +122,10 @@ export const categorizeStrings = async (req, res) => {
           });
         }
 
-        // Prepare Pinecone record
+
         upsertRecords.push({
-          id: crypto.randomUUID(), // Generate unique ID
-          values: item.vector, // The embedding we generated in Step 1
+          id: crypto.randomUUID(),
+          values: item.vector,
           metadata: {
             text: item.text,
             translation: suggestion,
@@ -137,9 +133,7 @@ export const categorizeStrings = async (req, res) => {
         });
       });
 
-      // 4. Upsert new translations back to Pinecone for future use
       if (upsertRecords.length > 0) {
-        // Fallback structure for Pinecone SDK v1/v2 compatibility
         await index.namespace(namespace).upsert({ records: upsertRecords });
       }
     }

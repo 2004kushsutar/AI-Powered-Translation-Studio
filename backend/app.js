@@ -15,15 +15,12 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-// if (process.env.NODE_ENV === "development") {
-//   app.use(morgan("dev"));
-// }
 
 app.use(morgan("dev"));
 
 const corsOptions = {
   origin: function (origin, callback) {
-    const whitelist = ["https://the-rag.netlify.app", "http://localhost:5173"];
+    const whitelist = ["http://localhost:5173"];
 
     const isLocalNetwork =
       /^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1]))/.test(origin);

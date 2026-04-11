@@ -15,7 +15,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
   const [segments, setSegments] = useState([]);
 
-  // Resolve JSON pointers maintaining chronological document reading order
+
   const resolveRef = (refStr, rootNode) => {
     if (!refStr || !rootNode) return null;
     const parts = refStr.replace('#/', '').split('/');
@@ -47,7 +47,6 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
         if (chunk && chunk.trim()) {
           let finalChunk = chunk;
 
-          // If we fell back to original chunks, forcefully apply AI suggestions
           if (!node.corrected_chunks && segIds[idx] !== undefined) {
             const segId = segIds[idx];
             const segIssues = issuesList.filter(i => i.affected_segments?.includes(segId));
@@ -107,7 +106,6 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
         }
       } catch (err) {
         console.error("Failed to fetch latest document from MongoDB", err);
-        // Fallback dummy
         setSegments([
           { id: 1, type: 'exact', tmMatch: 100, status: 'completed', source: 'Introduction to AI-Powered Automation', translation: 'एआई-संचालित स्वचालन का परिचय', confidence: 100 },
           { id: 2, type: 'fuzzy', tmMatch: 85, status: 'pending', source: 'Artificial intelligence has revolutionized the way we approach business automation.', translation: 'आर्टिफिशियल इंटेलिजेंस ने व्यापार स्वचालन को क्रांतिकारी रूप से बदल दिया है।', confidence: 85 }
@@ -185,14 +183,14 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
       }
     };
     reader.readAsText(file);
-    e.target.value = null; // reset input
+    e.target.value = null;
   };
 
   const handleAutoFill = async () => {
     setIsProcessing(true);
     const newSegments = [...segments];
 
-    // Collect texts for API
+
     const queries = [];
     const queryMap = {};
 
@@ -208,7 +206,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
       try {
         const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
 
-        const response = await fetch("http://192.168.137.211:3000/api/v1/match", {
+        const response = await fetch("http://192.168.137.153:3000/api/v1/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -217,7 +215,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
         if (response.ok) {
           const data = await response.json();
 
-          // Apply responses back to segments
+
           const applyData = (arr, newType) => {
             if (!arr) return;
             arr.forEach(match => {
@@ -253,7 +251,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     setIsRegenerating(true);
     try {
       const payload = { texts: [seg.source], sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
-      const response = await fetch("http://192.168.137.211:3000/api/v1/match", {
+      const response = await fetch("http://192.168.137.153:3000/api/v1/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -292,8 +290,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
   };
 
   const handleDownload = () => {
-    // A seamless browser-native way to generate a pristine PDF of the translated content
-    // without needing backend libraries!
+
     if (!showExport) {
       setShowExport(true);
       setTimeout(() => window.print(), 300);
@@ -302,7 +299,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     }
   };
 
-  // Helper to render the translated document seamlessly into semantic layout blocks
+
   const renderDocument = (node, index = 0, rootNode = liveData?.parsed?.data) => {
     if (!node) return null;
 
@@ -375,12 +372,12 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
           matchedSeg = segments.find(s => s.source === chunk.trim() || chunk.includes(s.source));
         }
 
-        // Substitute translation if available
+
         let displayText = matchedSeg && matchedSeg.translation && matchedSeg.translation.trim() !== ''
           ? matchedSeg.translation
           : chunk;
 
-        // If it fell back to original chunk, attempt to apply AI fixes to it so typos don't show up in the final export!
+
         if (displayText === chunk && !node.corrected_chunks && liveData?.issues) {
           const segIssues = liveData.issues.filter(issue => issue.affected_segments?.includes(doclingId));
           segIssues.forEach(issue => {
@@ -687,7 +684,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
   );
 }
 
-// Simple triangle polyfill for fuzzy icon
+
 function AlertTriangleMockup({ size, className }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
