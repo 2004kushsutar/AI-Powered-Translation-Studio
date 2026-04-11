@@ -59,20 +59,26 @@ def get_style_for_block(block, fitz_doc, pages_cache):
         bbox = prov[0].get("bbox", {})
         
         text_align = "left"
-        if bbox and "l" in bbox and "r" in bbox:
-            l = bbox["l"]
-            r = bbox["r"]
-            block_width = r - l
-            if block_width > 0:
-                if block_width > (page_width * 0.7):
-                    text_align = "left"
-                else:
-                    center_x = (l + r) / 2
-                    page_center = page_width / 2
-                    if abs(center_x - page_center) < (page_width * 0.05):
-                        text_align = "center"
-                    elif abs(page_width - r) < (page_width * 0.1) and l > (page_width * 0.2):
-                        text_align = "right"
+        if bbox:
+            l, r = -1, -1
+            if isinstance(bbox, list) and len(bbox) == 4:
+                l, t, r, b = bbox
+            elif isinstance(bbox, dict) and "l" in bbox and "r" in bbox:
+                l = bbox["l"]
+                r = bbox["r"]
+
+            if l != -1 and r != -1:
+                block_width = r - l
+                if block_width > 0:
+                    if block_width > (page_width * 0.7):
+                        text_align = "left"
+                    else:
+                        center_x = (l + r) / 2
+                        page_center = page_width / 2
+                        if abs(center_x - page_center) < (page_width * 0.05):
+                            text_align = "center"
+                        elif abs(page_width - r) < (page_width * 0.1) and l > (page_width * 0.2):
+                            text_align = "right"
             
         if fitz_page_index not in pages_cache:
             pages_cache[fitz_page_index] = extract_styles_from_page(fitz_page)

@@ -80,7 +80,9 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
     if (node.children && Array.isArray(node.children)) {
       node.children.forEach(child => extractSegments(child, rootNode, targetObj, counter, issuesList));
-    } else if (node.data?.table_cells) {
+    }
+
+    if (node.data?.table_cells && Array.isArray(node.data.table_cells)) {
       node.data.table_cells.forEach(cell => extractSegments(cell, rootNode, targetObj, counter, issuesList));
     }
   };
@@ -206,7 +208,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
       try {
         const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
 
-        const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
+        const response = await fetch("http://192.168.137.211:3000/api/v1/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -251,7 +253,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     setIsRegenerating(true);
     try {
       const payload = { texts: [seg.source], sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
-      const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
+      const response = await fetch("http://192.168.137.211:3000/api/v1/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -405,6 +407,14 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     }
 
     if (node.children && Array.isArray(node.children) && node.children.length > 0) {
+      if (node.label === 'list') {
+        return (
+          <ul key={index} className="doc-list pl-6 list-none my-2">
+            {node.children.map((childObj, i) => renderDocument(childObj, i, rootNode))}
+          </ul>
+        );
+      }
+
       return (
         <div key={index} className="node-group">
           {node.children.map((childObj, i) => renderDocument(childObj, i, rootNode))}
