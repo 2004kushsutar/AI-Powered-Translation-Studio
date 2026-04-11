@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Save, Download, Undo, Redo, FastForward, CheckCircle2, Target, Languages, ArrowRightLeft, Sparkles, RefreshCw, Edit2 } from 'lucide-react';
+import { FileText, Save, Download, Undo, Redo, FastForward, CheckCircle2, Target, Languages, ArrowRightLeft, Sparkles, RefreshCw, Edit2, Upload } from 'lucide-react';
 import './TranslationStudio.css';
 
 export default function TranslationStudio({ data, fileName, onSwitchMode }) {
@@ -11,6 +11,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
   const [liveData, setLiveData] = useState(data);
   const [sourceLang, setSourceLang] = useState('English');
   const [targetLang, setTargetLang] = useState('Hindi');
+  const [glossaryText, setGlossaryText] = useState('');
 
   const [segments, setSegments] = useState([]);
 
@@ -97,7 +98,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
           }
           setSegments(extracted);
           setLiveData(freshData);
-          setSourceLang(freshData?.source_language || 'English');
+          setSourceLang(freshData?.source_language || 'en');
           if (extracted.length > 0) setSelectedSegmentId(extracted[0].id);
         } else {
           throw new Error("Failed to fetch");
@@ -146,6 +147,45 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
   const getBadgeClass = (type) => `tm-badge tm-badge-${type}`;
 
+  const parseGlossary = (text) => {
+    if (!text || !text.trim()) return [];
+    return text.split('\n').map(line => {
+      const parts = line.split(':');
+      if (parts.length >= 2) {
+        return { term: parts[0].trim(), translation: parts[1].trim() };
+      }
+      return null;
+    }).filter(Boolean);
+  };
+
+  const handleGlossaryUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const content = evt.target.result;
+      if (file.name.endsWith(".json")) {
+        try {
+          const parsed = JSON.parse(content);
+          const lines = Object.entries(parsed).map(([k, v]) => `${k} : ${v}`);
+          setGlossaryText(prev => prev ? prev + "\n" + lines.join("\n") : lines.join("\n"));
+        } catch (err) {
+          alert("Invalid JSON glossary format.");
+        }
+      } else if (file.name.endsWith(".csv")) {
+        const lines = content.split('\n').slice(1);
+        const formatted = lines.map(l => {
+          const parts = l.split(',');
+          if (parts.length >= 2) return `${parts[0].trim()} : ${parts[1].trim()}`;
+          return null;
+        }).filter(Boolean);
+        setGlossaryText(prev => prev ? prev + "\n" + formatted.join("\n") : formatted.join("\n"));
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset input
+  };
+
   const handleAutoFill = async () => {
     setIsProcessing(true);
     const newSegments = [...segments];
@@ -164,7 +204,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
     if (queries.length > 0) {
       try {
-        const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang };
+        const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
 
         const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
           method: "POST",
@@ -210,7 +250,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     if (!seg) return;
     setIsRegenerating(true);
     try {
-      const payload = { texts: [seg.source], source_lang: sourceLang, target_lang: targetLang };
+      const payload = { texts: [seg.source], sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
       const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -401,25 +441,25 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
           <div className="lang-selector">
             <select className="lang-dropdown" value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
-              <option value="Hindi">Hindi</option>
-              <option value="German">German</option>
-              <option value="Italian">Italian</option>
-              <option value="Portuguese">Portuguese</option>
-              <option value="Russian">Russian</option>
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="hi">Hindi</option>
+              <option value="de">German</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="ru">Russian</option>
             </select>
             <ArrowRightLeft size={16} className="text-gray-400" />
             <select className="lang-dropdown" value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
-              <option value="Hindi">Hindi</option>
-              <option value="German">German</option>
-              <option value="Italian">Italian</option>
-              <option value="Portuguese">Portuguese</option>
-              <option value="Russian">Russian</option>
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="hi">Hindi</option>
+              <option value="de">German</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="ru">Russian</option>
             </select>
           </div>
 
@@ -552,6 +592,39 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
 
           {/* Right Sidebar: Segment Action Center */}
           <aside className="sidebar-tm-right">
+            <div className="glossary-section mb-6 p-5 rounded-xl bg-white border border-gray-200 shadow-sm transition hover:shadow-md">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md">
+                  <FileText size={16} />
+                </div>
+                <h3 className="text-sm font-bold text-gray-800">Project Glossary</h3>
+              </div>
+              <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                Enforce localized terminology constraints. Paste rules below or upload a file.
+              </p>
+
+              <div className="relative mb-3">
+                <textarea
+                  className="w-full text-sm p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all resize-y shadow-inner outline-none"
+                  rows={3}
+                  placeholder="e.g., PM : Project Manager"
+                  value={glossaryText}
+                  onChange={(e) => setGlossaryText(e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                  {glossaryText ? `${glossaryText.split('\n').filter(l => l.includes(':')).length} Active Rules` : 'No Rules'}
+                </span>
+                <label className="text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all flex items-center shadow-sm">
+                  <Upload size={14} className="mr-1.5" /> Upload File
+                  <input type="file" accept=".json,.csv" onChange={handleGlossaryUpload} className="hidden" />
+                </label>
+              </div>
+            </div>
+            <br />
+
             <div className="details-header">
               <h3>Segment Details</h3>
             </div>

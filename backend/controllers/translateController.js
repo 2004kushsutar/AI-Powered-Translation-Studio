@@ -1,25 +1,17 @@
 import { pipeline } from "@xenova/transformers";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+import crypto from "crypto"; // Native Node.js module for UUIDs
+// 1. Schema for Gemini Structured Output
 
-// --- Configuration ---
-// Initialize the latest Google AI SDK
-const ai = new GoogleGenAI({
-  apiKey: "AIzaSyAtEl74OgAVFLNVczKJ6iphizsB9OYpYjk",
-});
+const translationSchema = z.array(z.string()).describe(
+  "Array of translated strings matching input order"
+);
 
-// 1. Initialize Transformers Model for local embeddings
-let extractor;
-let extractorPromise;
-const initModel = async () => {
-  if (!extractorPromise) {
-    extractorPromise = pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
-  }
-  extractor = await extractorPromise;
-};
-
-initModel();
-
+// 2. Initialize Clients (Use Environment Variables!)
+const ai = new GoogleGenAI({ apiKey: "AIzaSyDHnMR3C-yH_f0mqn3DaFR0lnb9Teg3T1g" });
 const pc = new Pinecone({
   apiKey:
     "pcsk_A9aQi_LWxcEAaC4NiLVvgMAB6YXya4StFvhZKz5tFaTKMmHjMqqT16mhuwmyycoes8C5Z",
@@ -27,100 +19,134 @@ const pc = new Pinecone({
 
 const index = pc.index(
   "translation-memory",
-  "https://translation-memory-m7iybz0.svc.aped-4627-b74a.pinecone.io",
 );
 
-// const namespace = index.namespace("en-hi");
-
-// --- Helper: Gemini Translation ---
-async function getGeminiTranslation(text, targetLang) {
-  try {
-    // Using the specific preview model you requested
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
-      contents: `Translate to language code: ${targetLang}. Return ONLY the translation.\n\nText: ${text}`,
-    });
-
-    return response.text.trim();
-  } catch (error) {
-    console.error("Gemini SDK Error:", error);
-    return "Translation error";
-  }
-}
-
-// --- Helper: Create Embedding ---
-async function createEmbedding(text) {
+let extractor;
+const initModel = async () => {
   if (!extractor) {
-    await initModel();
+    extractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
   }
+};
+
+async function createEmbedding(text) {
+  await initModel(); // Ensure model is loaded
   const embedding = await extractor(text, { pooling: "mean", normalize: true });
   return Array.from(embedding.data);
 }
 
-// --- Main Controller ---
 export const categorizeStrings = async (req, res) => {
   try {
-    const { texts, sourceLang = "en", lang = "hi" } = req.body;
+    const { texts, sourceLang = "en", lang = "hi", glossary = [] } = req.body;
 
-    if (!texts || !Array.isArray(texts)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid input. 'texts' must be an array." });
-    }
+    // Auto-map UI human strings back to short codes for Pinecone Namespace logic
+    const langMap = { english: "en", hindi: "hi", spanish: "es", french: "fr", german: "de", italian: "it", portuguese: "pt", russian: "ru" };
+    const nsSource = langMap[sourceLang.toLowerCase()] || sourceLang;
+    const nsTarget = langMap[lang.toLowerCase()] || lang;
+    const namespace = `${nsSource}-${nsTarget}`;
+    const results = { exact: [], fuzzy: [], new: [] };
+    const needsTranslation = [];
 
-    const results = {
-      exact: [],
-      fuzzy: [],
-      new: [],
-    };
+    // 1. Parallel Search (Same as before)
+    await Promise.all(
+      texts.map(async (text) => {
+        const queryVector = await createEmbedding(text);
+        const response = await index.namespace(namespace).query({
+          vector: queryVector,
+          topK: 1,
+          includeMetadata: true,
+        });
 
-    for (const text of texts) {
-      // 1. Get Vector
-      const queryVector = await createEmbedding(text);
+        const bestMatch = response.matches?.[0];
+        const score = bestMatch ? Number(bestMatch.score.toFixed(4)) : 0;
 
-      // 2. Query Pinecone
-      const response = await index.namespace(`${sourceLang}-${lang}`).query({
-        vector: queryVector,
-        topK: 1,
-        includeMetadata: true,
+        if (score >= 0.99) {
+          results.exact.push({
+            text,
+            score,
+            translation: bestMatch.metadata?.translation || "N/A",
+          });
+        } else {
+          needsTranslation.push({
+            text,
+            vector: queryVector, // Store vector here to reuse it for upserting later
+            score,
+            type: score >= 0.75 ? "fuzzy" : "new",
+            matchText: bestMatch?.metadata?.text || null,
+            existingMatchTranslation: bestMatch?.metadata?.translation || null,
+          });
+        }
+      }),
+    );
+
+    // 2. Batch Call to Gemini
+    if (needsTranslation.length > 0) {
+      const textsToTranslate = needsTranslation.map((item) => item.text);
+
+      let glossaryInstruction = "";
+      if (glossary && glossary.length > 0) {
+        glossaryInstruction = `\nCRITICAL GLOSSARY CONSTRAINTS: You must enforce the following translated terminology strictly:\n`;
+        glossaryInstruction += glossary.map(g => `- Base term '${g.term}' MUST translate exactly as '${g.translation}'`).join('\n');
+      }
+
+      const prompt = `Translate this array of strings into language code "${lang}". Maintain order.${glossaryInstruction}\nInput: ${JSON.stringify(textsToTranslate)}`;
+
+      const aiResponse = await ai.models.generateContent({
+        model: "gemini-3.1-flash-lite-preview",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: zodToJsonSchema(translationSchema),
+        },
       });
 
-      const bestMatch = response.matches?.[0];
-      const score = bestMatch ? bestMatch.score : 0;
-      const scoreFormatted = Number(score.toFixed(4));
+      const translations = translationSchema.parse(
+        JSON.parse(aiResponse.text),
+      );
 
-      // 3. Logic & AI Translation
-      if (score >= 0.99) {
-        // EXACT: No AI call needed, use DB
-        results.exact.push({
-          text: text,
-          score: scoreFormatted,
-          translation: bestMatch.metadata?.translation || "N/A",
+      // 3. Prepare records for Pinecone Upsert
+      const upsertRecords = [];
+
+      needsTranslation.forEach((item, index) => {
+        const suggestion = translations[index] || "Translation missing";
+
+        // Add to response results
+        if (item.type === "fuzzy") {
+          results.fuzzy.push({
+            text: item.text,
+            score: item.score,
+            matchText: item.matchText,
+            existingMatchTranslation: item.existingMatchTranslation,
+            suggested_translation: suggestion,
+          });
+        } else {
+          results.new.push({
+            text: item.text,
+            score: item.score,
+            suggested_translation: suggestion,
+          });
+        }
+
+        // Prepare Pinecone record
+        upsertRecords.push({
+          id: crypto.randomUUID(), // Generate unique ID
+          values: item.vector, // The embedding we generated in Step 1
+          metadata: {
+            text: item.text,
+            translation: suggestion,
+          },
         });
-      } else if (score >= 0.75 && score < 0.99) {
-        // FUZZY: Get AI suggestion + DB reference
-        const suggestion = await getGeminiTranslation(text, lang);
-        results.fuzzy.push({
-          text: text,
-          score: scoreFormatted,
-          matchText: bestMatch.metadata?.text || null,
-          existingMatchTranslation: bestMatch.metadata?.translation || null,
-          suggested_translation: suggestion,
-        });
-      } else {
-        // NEW: Pure AI translation
-        const suggestion = await getGeminiTranslation(text, lang);
-        results.new.push({
-          text: text,
-          score: scoreFormatted,
-          suggested_translation: suggestion,
-        });
+      });
+
+      // 4. Upsert new translations back to Pinecone for future use
+      if (upsertRecords.length > 0) {
+        // Fallback structure for Pinecone SDK v1/v2 compatibility
+        await index.namespace(namespace).upsert({ records: upsertRecords });
       }
     }
 
     return res.status(200).json(results);
   } catch (error) {
-    console.error("Internal Server Error:", error);
+    console.error("Batch Translation & Upsert Error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };

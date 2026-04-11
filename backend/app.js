@@ -15,9 +15,11 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+// if (process.env.NODE_ENV === "development") {
+//   app.use(morgan("dev"));
+// }
+
+app.use(morgan("dev"));
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -51,7 +53,10 @@ app.use(cookieParser());
 app.use("/api/v1", translateRouter);
 
 app.use((req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  res.status(404).json({
+    status: "fail",
+    message: `Can't find ${req.originalUrl} on this server!`
+  });
 });
 
 export default app;
