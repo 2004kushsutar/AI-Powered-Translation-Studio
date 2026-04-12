@@ -46,3 +46,5 @@ htmlcov/
 *.zip
 *.tar
 *.gz
+
+uploads/
