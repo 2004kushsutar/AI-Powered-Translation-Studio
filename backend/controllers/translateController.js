@@ -4,6 +4,9 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import crypto from "crypto";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./config.env" });
 
 const translationSchema = z.array(z.string()).describe(
   "Array of translated strings matching input order"
@@ -11,7 +14,7 @@ const translationSchema = z.array(z.string()).describe(
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 const pc = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY,
+  apiKey: process.env.PINECONE_API_KEY || process.env.PINECONE,
 });
 
 const index = pc.index(

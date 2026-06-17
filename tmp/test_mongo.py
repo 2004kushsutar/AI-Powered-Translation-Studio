@@ -14,15 +14,15 @@ async def test_insert():
     client = AsyncIOMotorClient(MONGO_URI)
     db = client[DB_NAME]
     
-    try:
-        with open("processed_output.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
+    # try:
+    #     with open("processed_output.json", "r", encoding="utf-8") as f:
+    #         data = json.load(f)
             
-        print("Inserting document...")
-        result = await db.documents.insert_one(data)
-        print(f"Inserted successfully! ID: {result.inserted_id}")
-    except Exception as e:
-        print(f"Error occurred: {type(e).__name__}: {e}")
+    #     print("Inserting document...")
+    #     result = await db.documents.insert_one(data)
+    #     print(f"Inserted successfully! ID: {result.inserted_id}")
+    # except Exception as e:
+    #     print(f"Error occurred: {type(e).__name__}: {e}")
         
     client.close()
 

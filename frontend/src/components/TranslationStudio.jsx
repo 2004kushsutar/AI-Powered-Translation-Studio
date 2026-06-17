@@ -206,7 +206,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
       try {
         const payload = { texts: queries, sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
 
-        const response = await fetch("http://192.168.137.153:3000/api/v1/match", {
+        const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -251,7 +251,7 @@ export default function TranslationStudio({ data, fileName, onSwitchMode }) {
     setIsRegenerating(true);
     try {
       const payload = { texts: [seg.source], sourceLang: sourceLang, lang: targetLang, glossary: parseGlossary(glossaryText) };
-      const response = await fetch("http://192.168.137.153:3000/api/v1/match", {
+      const response = await fetch("http://127.0.0.1:4000/api/v1/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
