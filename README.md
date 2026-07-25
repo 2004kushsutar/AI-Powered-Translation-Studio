@@ -2,6 +2,16 @@
 
 An AI-powered translation pipeline and studio application. This project features a full-stack architecture with a React frontend, a Node.js (Express) backend for orchestration, and a Python FastAPI service for AI pipelines.
 
+## Key Features
+
+- **Document Parsing**: Efficiently parse and extract text from various document formats.
+- **Document Validation**: Validate document structures and contents before processing.
+- **Document Translation**: High-quality AI-powered document translation.
+- **Translation Memory**: Store and reuse previously translated segments to improve consistency and speed.
+- **Glossary Enforcement**: Ensure domain-specific terminology is translated accurately and consistently.
+- **Review and approval layer**: Linguists can review and approve the translated content.
+- **Multi-format support**: Download translated content in the same format as the original document.
+
 ## Project Structure
 
 - `frontend/` - A React frontend built with Vite.
