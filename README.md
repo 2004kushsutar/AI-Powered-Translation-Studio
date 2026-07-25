@@ -11,6 +11,7 @@ An AI-powered translation pipeline and studio application. This project features
 - **Glossary Enforcement**: Ensure domain-specific terminology is translated accurately and consistently.
 - **Review and approval layer**: Linguists can review and approve the translated content.
 - **Multi-format support**: Download translated content in the same format as the original document.
+- **Efficient token usage**: Save tokens by using translation memory and glossary enforcement.
 
 ## Project Structure
 
