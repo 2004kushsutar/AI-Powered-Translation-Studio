@@ -51,12 +51,12 @@ An AI-powered translation pipeline and studio application. This project features
    ```bash
    npm install
    ```
-3. Ensure you have a `config.env` file configured in the `backend` directory with your necessary API keys (MONGO_URI="<your-mongo-uri>"
-MONGO_DB_NAME="<your-mongo-db-name>"
+3. Ensure you have a `config.env` file configured in the `backend` directory with your necessary API keys (MONGO_URI="your-mongo-uri"
+MONGO_DB_NAME="your-mongo-db-name"
 PORT = 4000
 NODE_ENV = development
-GOOGLE_API_KEY = <your-google-api-key>
-PINECONE = <your-pinecone-api-key>).
+GOOGLE_API_KEY = your-google-api-key
+PINECONE = your-pinecone-api-key).
 
 4. Start the backend development server in watch mode:
    ```bash
